@@ -3,6 +3,8 @@ import numpy as np
 import math
 import tensorflow as tf
 
+tf.reset_default_graph()
+
 # 도쿄 23구 csv 넣기
 df_house = pd.read_csv('../scraping/house.csv', sep='\t', encoding='utf-8')
 df = pd.concat([
@@ -32,11 +34,12 @@ X = data
 x = tf.placeholder(tf.float32, [None,28])
 y = tf.placeholder(tf.float32, [None,1])
 
+file = 'house'
 # TODO: (학습데이터 80%)/(검증 데이터 20%) 나누어야 함 (지금은 적용 안된 거)
 # dense 신경망 모델로 학습 (이 부분부터는 무슨 모델이 정답인지 모르겠습니다. 여러 모델로 시도해봐주세요)
-L1 = tf.layers.dense(x, units=10, activation=tf.nn.relu)
-L2 = tf.layers.dense(L1, units=10, activation=tf.nn.relu)
-L3 = tf.layers.dense(L2, units=1, activation=None)
+L1 = tf.layers.dense(x, units=10, activation=tf.nn.relu, name=file+"L1")
+L2 = tf.layers.dense(L1, units=10, activation=tf.nn.relu, name=file+"L2")
+L3 = tf.layers.dense(L2, units=1, activation=None, name=file+"L3")
 loss = tf.reduce_mean( 0.5*tf.square(L3-y) )
 train = tf.train.AdamOptimizer(0.1).minimize(loss)
 saver = tf.train.Saver()
@@ -50,7 +53,7 @@ for j in range(50000):
 # 학습 결과
 print("loss값 : {}".format(loss_) )
 # loss 값이 적을수록 좋은데, 고성능의 컴퓨터일수록 결과가 좋게 나왔음
-saver.save(sess, './model/house', global_step=0)  # 모델 저장
+saver.save(sess, './model/' + file, global_step=0)  # 모델 저장
 
 # 학습 모델 테스트
 test = df[0:5]
